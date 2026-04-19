@@ -91,15 +91,8 @@ All changes relative to the original `discord-matrix-clone-backup`.
 ### OpenClaw Bot Config Fix (DONE)
 - Bot was in a feedback loop: sending messages → seeing its own messages → responding → repeat → OOM kill
 - Fix: `channels.matrix.allowBots: "mentions"` — ignores bot messages unless they @mention it
-- Bryan's messages still trigger normally (no @ needed)
+- Owner messages still trigger normally (no @ needed)
 - Other bots can trigger it via @mention
-- VPS SSH: `ssh -i ~/.ssh/vps_deploy -p 2222 root@REDACTED_VPS` (root user, not bryan)
 
 ### Not Yet Done
 - [ ] (Optional) Delete callStore.ts and clean onCallMember from events.ts
-
-### Reference
-- Backup of original: `~/claudedir/discord-matrix-clone-backup/`
-- Data dir (shared): `~/.local/share/com.hoomestead.chat/`
-- Matrix homeserver: `matrix.example.com`
-- User: `@user:example.com`

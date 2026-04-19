@@ -5,7 +5,7 @@ Desktop chat app (Electron + Rust sidecar + React 19 + matrix-sdk 0.10) that rep
 
 ## Architecture
 - **Desktop Shell**: Electron (frameless window, custom titlebar)
-- **Backend**: Rust HTTP server (axum) + matrix-sdk → communicates with `matrix.example.com`
+- **Backend**: Rust HTTP server (axum) + matrix-sdk → communicates with a Matrix homeserver (user-configured at login)
 - **Communication**: HTTP REST + SSE (Server-Sent Events) on localhost
 - **Frontend**: React 19 + TypeScript + Vite, styled with custom Discord-theme CSS
 - **State**: Zustand stores (auth, spaces, rooms, messages, members)
@@ -42,8 +42,7 @@ npm run typecheck
   - `styles/` — Discord dark theme CSS
 
 ## Matrix Server
-- Homeserver: `matrix.example.com`
-- User: `@user:example.com`
+Homeserver and user are configured at login (no hardcoded defaults).
 
 ## Build Output
 - `dist/` — built frontend (Vite output, loaded by Electron in production)

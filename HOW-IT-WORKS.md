@@ -12,7 +12,7 @@ Electron (frameless window)
 ```
 
 - **Frontend**: React 19 + TypeScript + Vite + Zustand stores
-- **Backend**: Rust (axum + matrix-sdk 0.10) → matrix.example.com
+- **Backend**: Rust (axum + matrix-sdk 0.10) → user-configured Matrix homeserver
 - **Communication**: HTTP REST + SSE (Server-Sent Events) on localhost
 - **Data dir**: `~/.local/share/com.hoomestead.chat/` (session.json, SQLite stores)
 
