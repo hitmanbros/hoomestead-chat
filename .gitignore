@@ -20,3 +20,5 @@ credentials*
 *.deb
 *.rpm
 .aider*
+
+SESSION_TRANSCRIPT.md

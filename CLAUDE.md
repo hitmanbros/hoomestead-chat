@@ -44,3 +44,27 @@ npm run typecheck
 ## Matrix Server
 - Homeserver: `matrix.hoomestead.com`
 - User: `@bryan:hoomestead.com`
+
+## Build Output
+- `dist/` — built frontend (Vite output, loaded by Electron in production)
+- `dist-electron/` — compiled Electron main + preload (TypeScript -> JS)
+- `release/` — electron-builder output: `linux-unpacked/`, `openclaw-client_1.0.0_amd64.deb`, `latest-linux.yml` (electron-updater metadata)
+- `src-rust/target/release/openclaw-client-backend` — Rust sidecar binary, bundled via `extraResources` in package.json
+
+## Startup sequence (see HOW-IT-WORKS.md for detail)
+1. Electron spawns Rust sidecar. Awaits `{"port": N}` JSON on stdout (**10s timeout** — else app quits).
+2. Sidecar binds random port, prints port, starts axum + matrix-sdk.
+3. Preload exposes `window.api.getBackendUrl()`.
+4. React `App.tsx` → `waitForBackendUrl()` → `restoreSession()` → opens SSE stream.
+5. Frontend renders only after `sync-ready` SSE event fires (initial Matrix sync complete).
+
+## Fixed: blank screen on packaged launch (2026-04-18)
+**Cause:** Vite default `base: "/"` emits absolute asset paths in `dist/index.html` (`src="/assets/..."`). Electron loads via `file://` so `/assets/...` resolves to filesystem root → 404 → React never mounts → blank window (just `backgroundColor: #1e1f22`, no titlebar).
+**Fix:** Set `base: "./"` in `vite.config.ts`. Now emits `./assets/...` which resolves relative to `index.html`.
+Always keep this when packaging a Vite frontend into Electron.
+
+## Shared data dir
+`~/.local/share/com.hoomestead.chat/` — SQLite DB + Matrix session. Running two backends (dev + packaged) causes SQLite lock collision. Close one first.
+
+## Bot interaction
+`allowBots` setting default `"mentions"` — bots only respond to `@botname`. Prevents OpenClaw agent feedback loops.
