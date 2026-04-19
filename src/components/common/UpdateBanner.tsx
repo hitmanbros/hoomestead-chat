@@ -4,54 +4,95 @@ import { onClientUpdate, type ClientUpdateEvent } from "../../api/events";
 declare global {
   interface Window {
     electronAPI?: {
-      runUpdate?: () => Promise<void>;
+      checkForUpdates?: () => Promise<void>;
+      downloadUpdate?: () => Promise<void>;
+      installUpdate?: () => Promise<void>;
+      onUpdateAvailable?: (cb: (info: { version: string }) => void) => void;
+      onUpdateProgress?: (cb: (info: { percent: number }) => void) => void;
+      onUpdateDownloaded?: (cb: () => void) => void;
+      onUpdateError?: (cb: (msg: string) => void) => void;
       [key: string]: unknown;
     };
   }
 }
 
+type UpdateState = "idle" | "available" | "downloading" | "ready" | "error";
+
 export default function UpdateBanner() {
-  const [update, setUpdate] = useState<ClientUpdateEvent | null>(null);
-  const [updating, setUpdating] = useState(false);
+  const [state, setState] = useState<UpdateState>("idle");
+  const [message, setMessage] = useState("");
+  const [percent, setPercent] = useState(0);
 
   useEffect(() => {
-    return onClientUpdate((event) => {
-      setUpdate(event);
+    const api = window.electronAPI;
+    if (!api) return;
+
+    api.onUpdateAvailable?.((info) => {
+      setState("available");
+      setMessage(`v${info.version} available`);
+    });
+
+    api.onUpdateProgress?.((info) => {
+      setPercent(info.percent);
+    });
+
+    api.onUpdateDownloaded?.(() => {
+      setState("ready");
+    });
+
+    api.onUpdateError?.((msg) => {
+      setState("error");
+      setMessage(msg);
+    });
+
+    return onClientUpdate((event: ClientUpdateEvent) => {
+      if (state === "idle") {
+        setState("available");
+        setMessage(event.message || "new changes pushed");
+        api.checkForUpdates?.();
+      }
     });
   }, []);
 
-  if (!update) return null;
+  if (state === "idle") return null;
 
-  const handleUpdate = async () => {
-    setUpdating(true);
-    try {
-      await window.electronAPI?.runUpdate?.();
-    } catch {
-      setUpdating(false);
-    }
+  const handleDownload = () => {
+    setState("downloading");
+    window.electronAPI?.downloadUpdate?.();
+  };
+
+  const handleInstall = () => {
+    window.electronAPI?.installUpdate?.();
   };
 
   const handleDismiss = () => {
-    setUpdate(null);
+    setState("idle");
+    setMessage("");
   };
 
   return (
     <div className="update-banner">
       <span className="update-banner-text">
-        {updating
-          ? "Updating... pulling changes and rebuilding"
-          : `Update available: ${update.message || "new changes pushed"}`}
+        {state === "available" && `Update ${message}`}
+        {state === "downloading" && `Downloading update... ${percent}%`}
+        {state === "ready" && "Update ready — restart to apply"}
+        {state === "error" && `Update failed: ${message}`}
       </span>
-      {!updating && (
-        <div className="update-banner-actions">
-          <button className="update-banner-btn update" onClick={handleUpdate}>
-            Update & Restart
+      <div className="update-banner-actions">
+        {state === "available" && (
+          <button className="update-banner-btn update" onClick={handleDownload}>
+            Download Update
           </button>
-          <button className="update-banner-btn dismiss" onClick={handleDismiss}>
-            Later
+        )}
+        {state === "ready" && (
+          <button className="update-banner-btn update" onClick={handleInstall}>
+            Restart Now
           </button>
-        </div>
-      )}
+        )}
+        <button className="update-banner-btn dismiss" onClick={handleDismiss}>
+          {state === "error" ? "Dismiss" : "Later"}
+        </button>
+      </div>
     </div>
   );
 }

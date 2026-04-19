@@ -1,5 +1,6 @@
 import { app, BrowserWindow, ipcMain } from "electron";
-import { spawn, execFile, ChildProcess } from "child_process";
+import { autoUpdater } from "electron-updater";
+import { spawn, ChildProcess } from "child_process";
 import path from "path";
 
 let mainWindow: BrowserWindow | null = null;
@@ -7,13 +8,10 @@ let sidecar: ChildProcess | null = null;
 let backendPort: number | null = null;
 
 function getSidecarPath(): string {
-  const isPackaged = app.isPackaged;
-  if (isPackaged) {
-    // In production, the binary is bundled as an extra resource
+  if (app.isPackaged) {
     const ext = process.platform === "win32" ? ".exe" : "";
     return path.join(process.resourcesPath, `hoomestead-chat-server${ext}`);
   }
-  // In development, use the cargo-built binary
   const ext = process.platform === "win32" ? ".exe" : "";
   return path.join(__dirname, "..", "src-rust", "target", "release", `hoomestead-chat-server${ext}`);
 }
@@ -71,13 +69,41 @@ function startSidecar(): Promise<number> {
       sidecar = null;
     });
 
-    // Timeout after 10 seconds
     setTimeout(() => {
       if (!resolved) {
         resolved = true;
         reject(new Error("Backend did not report port within 10 seconds"));
       }
     }, 10000);
+  });
+}
+
+function setupAutoUpdater() {
+  autoUpdater.autoDownload = false;
+  autoUpdater.autoInstallOnAppQuit = true;
+
+  autoUpdater.on("update-available", (info) => {
+    console.log(`Update available: v${info.version}`);
+    mainWindow?.webContents.send("update-available", {
+      version: info.version,
+      releaseNotes: info.releaseNotes,
+    });
+  });
+
+  autoUpdater.on("download-progress", (progress) => {
+    mainWindow?.webContents.send("update-progress", {
+      percent: Math.round(progress.percent),
+    });
+  });
+
+  autoUpdater.on("update-downloaded", () => {
+    console.log("Update downloaded, ready to install");
+    mainWindow?.webContents.send("update-downloaded");
+  });
+
+  autoUpdater.on("error", (err) => {
+    console.error("Auto-updater error:", err.message);
+    mainWindow?.webContents.send("update-error", err.message);
   });
 }
 
@@ -97,7 +123,6 @@ function createWindow() {
     },
   });
 
-  // IPC handlers for window controls
   ipcMain.handle("window-minimize", () => mainWindow?.minimize());
   ipcMain.handle("window-maximize", () => {
     if (mainWindow?.isMaximized()) {
@@ -132,30 +157,30 @@ app.whenReady().then(async () => {
 
   ipcMain.handle("get-backend-url", () => `http://127.0.0.1:${backendPort}`);
 
-  ipcMain.handle("run-update", () => {
-    return new Promise<void>((resolve, reject) => {
-      const scriptPath = path.join(__dirname, "..", "scripts", "update.sh");
-      console.log(`Running update script: ${scriptPath}`);
-      execFile("bash", [scriptPath], { timeout: 300000 }, (err, stdout, stderr) => {
-        if (err) {
-          console.error("Update failed:", stderr || err.message);
-          reject(err);
-          return;
-        }
-        console.log("Update output:", stdout);
-        resolve();
-        // Kill sidecar and relaunch
-        if (sidecar) {
-          sidecar.kill();
-          sidecar = null;
-        }
-        app.relaunch();
-        app.exit(0);
-      });
-    });
+  ipcMain.handle("check-for-updates", () => {
+    if (app.isPackaged) {
+      autoUpdater.checkForUpdates();
+    }
   });
 
+  ipcMain.handle("download-update", () => {
+    autoUpdater.downloadUpdate();
+  });
+
+  ipcMain.handle("install-update", () => {
+    if (sidecar) {
+      sidecar.kill();
+      sidecar = null;
+    }
+    autoUpdater.quitAndInstall();
+  });
+
+  setupAutoUpdater();
   createWindow();
+
+  if (app.isPackaged) {
+    autoUpdater.checkForUpdates();
+  }
 
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) {
