@@ -1,5 +1,5 @@
 import { app, BrowserWindow, ipcMain } from "electron";
-import { spawn, ChildProcess } from "child_process";
+import { spawn, execFile, ChildProcess } from "child_process";
 import path from "path";
 
 let mainWindow: BrowserWindow | null = null;
@@ -131,6 +131,29 @@ app.whenReady().then(async () => {
   }
 
   ipcMain.handle("get-backend-url", () => `http://127.0.0.1:${backendPort}`);
+
+  ipcMain.handle("run-update", () => {
+    return new Promise<void>((resolve, reject) => {
+      const scriptPath = path.join(__dirname, "..", "scripts", "update.sh");
+      console.log(`Running update script: ${scriptPath}`);
+      execFile("bash", [scriptPath], { timeout: 300000 }, (err, stdout, stderr) => {
+        if (err) {
+          console.error("Update failed:", stderr || err.message);
+          reject(err);
+          return;
+        }
+        console.log("Update output:", stdout);
+        resolve();
+        // Kill sidecar and relaunch
+        if (sidecar) {
+          sidecar.kill();
+          sidecar = null;
+        }
+        app.relaunch();
+        app.exit(0);
+      });
+    });
+  });
 
   createWindow();
 
