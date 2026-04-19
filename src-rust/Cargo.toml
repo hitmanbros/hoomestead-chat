@@ -1,0 +1,27 @@
+[package]
+name = "hoomestead-chat-server"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "hoomestead-chat-server"
+path = "src/main.rs"
+
+[dependencies]
+matrix-sdk = { version = "0.10", features = ["e2e-encryption", "sqlite", "markdown", "bundled-sqlite"] }
+tokio = { version = "1", features = ["full"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+anyhow = "1"
+mime = "0.3.17"
+futures = "0.3.32"
+base64 = "0.22.1"
+reqwest = { version = "0.12", features = ["json"] }
+urlencoding = "2"
+url = "2"
+dirs = "6"
+axum = { version = "0.8", features = ["multipart"] }
+tower-http = { version = "0.6", features = ["cors"] }
+tokio-stream = { version = "0.1", features = ["sync"] }
