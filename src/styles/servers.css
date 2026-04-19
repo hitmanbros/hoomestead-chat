@@ -1,0 +1,147 @@
+.server-list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding-bottom: 12px;
+}
+
+.server-separator {
+  width: 32px;
+  height: 2px;
+  background: var(--background-modifier-accent);
+  border-radius: 1px;
+  margin: 0 auto;
+}
+
+.server-icon-wrapper {
+  position: relative;
+  width: 48px;
+  height: 48px;
+}
+
+.server-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--background-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: border-radius 0.15s ease, background-color 0.15s ease, color 0.15s ease;
+  overflow: hidden;
+  color: var(--text-normal);
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.server-icon:hover,
+.server-icon.selected {
+  border-radius: 16px;
+}
+
+.server-icon:hover {
+  background: var(--brand-500);
+  color: white;
+}
+
+.server-icon.selected {
+  background: var(--brand-500);
+  color: white;
+}
+
+.server-icon.home {
+  background: var(--background-primary);
+  color: var(--text-normal);
+}
+
+.server-icon.home:hover,
+.server-icon.home.selected {
+  background: var(--brand-500);
+  color: white;
+  border-radius: 16px;
+}
+
+.server-icon.add {
+  background: var(--background-primary);
+  color: var(--green-360);
+  font-size: 24px;
+}
+
+.server-icon.add:hover {
+  background: var(--green-360);
+  color: white;
+  border-radius: 16px;
+}
+
+.server-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Pill indicator on left side */
+.server-pill {
+  position: absolute;
+  left: -4px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 8px;
+  background: var(--header-primary);
+  border-radius: 0 4px 4px 0;
+  transition: height 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  height: 0;
+}
+
+.server-icon-wrapper:hover .server-pill {
+  height: 20px;
+}
+
+.server-icon-wrapper.selected .server-pill {
+  height: 40px;
+}
+
+.server-icon-wrapper.has-unread .server-pill {
+  height: 8px;
+}
+
+/* Notification badge (bottom-right of icon) */
+.server-badge {
+  position: absolute;
+  bottom: -4px;
+  right: -4px;
+  background: var(--red-400);
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid var(--background-tertiary);
+  z-index: 1;
+  line-height: 1;
+  animation: badge-pop 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes badge-pop {
+  from { opacity: 0; transform: scale(0.6); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* Loading skeleton */
+.skeleton-server {
+  background: var(--background-modifier-accent) !important;
+  animation: skeleton-pulse 1.2s ease-in-out infinite;
+  cursor: default !important;
+}
+
+.skeleton-server:hover {
+  background: var(--background-modifier-accent) !important;
+  border-radius: 50% !important;
+}

@@ -1,0 +1,421 @@
+:root {
+  --background-primary: #313338;
+  --background-secondary: #2b2d31;
+  --background-tertiary: #1e1f22;
+  --background-floating: #111214;
+  --text-normal: #dbdee1;
+  --text-muted: #949ba4;
+  --text-link: #00a8fc;
+  --header-primary: #f2f3f5;
+  --brand-500: #5865f2;
+  --brand-experiment-560: #4752c4;
+  --green-360: #23a55a;
+  --yellow-300: #f0b232;
+  --red-400: #f23f43;
+  --background-modifier-hover: rgba(78, 80, 88, 0.3);
+  --background-modifier-selected: rgba(78, 80, 88, 0.6);
+  --background-modifier-accent: rgba(78, 80, 88, 0.48);
+  --scrollbar-thin-thumb: #1a1b1e;
+  --scrollbar-thin-track: transparent;
+  --channel-icon: #80848e;
+  --input-background: #383a40;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+body {
+  background-color: var(--background-tertiary);
+  color: var(--text-normal);
+  font-family: "Inter", "gg sans", "Noto Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.375;
+  -webkit-font-smoothing: antialiased;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--scrollbar-thin-track);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thin-thumb);
+  border-radius: 4px;
+  min-height: 40px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #232428;
+}
+
+/* Wider scrollbar for main content areas */
+.message-list-container::-webkit-scrollbar,
+.member-sidebar::-webkit-scrollbar {
+  width: 16px;
+}
+
+.message-list-container::-webkit-scrollbar-thumb,
+.member-sidebar::-webkit-scrollbar-thumb {
+  border: 4px solid transparent;
+  background-clip: padding-box;
+  border-radius: 8px;
+}
+
+button {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+}
+
+input, textarea {
+  background: var(--input-background);
+  color: var(--text-normal);
+  border: none;
+  border-radius: 8px;
+  font: inherit;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+input::placeholder, textarea::placeholder {
+  color: var(--text-muted);
+}
+
+a {
+  color: var(--text-link);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+::selection {
+  background-color: var(--brand-500);
+  color: white;
+}
+
+ul, ol {
+  list-style: none;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  animation: fade-in 0.15s ease-out;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal-content {
+  background: var(--background-primary);
+  border-radius: 8px;
+  width: 440px;
+  max-width: 90vw;
+  padding: 16px;
+  animation: modal-pop 0.15s ease-out;
+}
+
+@keyframes modal-pop {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.modal-header h2 {
+  color: var(--header-primary);
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.modal-close {
+  font-size: 24px;
+  color: var(--text-muted);
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: color 0.15s, background 0.15s;
+}
+
+.modal-close:hover {
+  color: var(--text-normal);
+  background: var(--background-modifier-hover);
+}
+
+/* Context Menu */
+.context-menu {
+  background: var(--background-floating);
+  border-radius: 4px;
+  padding: 6px 8px;
+  min-width: 180px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.24);
+  animation: context-pop 0.1s ease-out;
+}
+
+@keyframes context-pop {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.context-menu-item {
+  padding: 6px 8px;
+  border-radius: 2px;
+  font-size: 14px;
+  color: var(--text-normal);
+  cursor: pointer;
+  transition: background 0.05s;
+}
+
+.context-menu-item:hover {
+  background: var(--brand-500);
+  color: white;
+}
+
+.context-menu-item.danger {
+  color: var(--red-400);
+}
+
+.context-menu-item.danger:hover {
+  background: var(--red-400);
+  color: white;
+}
+
+.context-menu-divider {
+  height: 1px;
+  background: var(--background-modifier-accent);
+  margin: 4px 0;
+}
+
+/* Tooltip */
+.tooltip-wrapper {
+  position: relative;
+}
+
+.tooltip {
+  background: var(--background-floating);
+  color: var(--text-normal);
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  pointer-events: none;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.24);
+  animation: tooltip-in 0.1s ease-out;
+}
+
+/* Toast notifications */
+.toast-container {
+  position: fixed;
+  top: 32px;
+  right: 16px;
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 18px;
+  border-radius: 6px;
+  background: var(--background-floating);
+  color: var(--text-normal);
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  pointer-events: auto;
+  cursor: pointer;
+  animation: toast-in 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(-12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.toast-icon {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.toast-success .toast-icon { color: var(--green-360); }
+.toast-error .toast-icon { color: var(--red-400); }
+.toast-info .toast-icon { color: var(--brand-500); }
+
+.toast-message {
+  flex: 1;
+}
+
+/* Confirm Modal */
+.confirm-description {
+  color: var(--text-muted);
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+.confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.confirm-cancel {
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 14px;
+  color: var(--text-normal);
+  background: none;
+}
+
+.confirm-cancel:hover {
+  text-decoration: underline;
+}
+
+.confirm-button {
+  padding: 8px 20px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  color: white;
+  background: var(--brand-500);
+  transition: background 0.15s, transform 0.1s;
+}
+
+.confirm-button:hover:not(:disabled) {
+  background: var(--brand-experiment-560);
+}
+
+.confirm-button.danger {
+  background: var(--red-400);
+}
+
+.confirm-button.danger:hover:not(:disabled) {
+  background: #a12d2f;
+}
+
+.confirm-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Error boundary */
+.error-boundary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background: var(--background-tertiary);
+}
+
+.error-boundary-content {
+  text-align: center;
+  max-width: 400px;
+  padding: 32px;
+}
+
+.error-boundary-icon {
+  margin-bottom: 16px;
+}
+
+.error-boundary-content h2 {
+  color: var(--header-primary);
+  font-size: 20px;
+  margin-bottom: 8px;
+}
+
+.error-boundary-content p {
+  color: var(--text-muted);
+  font-size: 14px;
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+.error-boundary-btn {
+  background: var(--brand-500);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 24px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.error-boundary-btn:hover {
+  background: var(--brand-experiment-560);
+}
+
+/* Skeleton animations */
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.6; }
+}
+
+/* Button press feedback */
+.confirm-button:active:not(:disabled),
+.settings-btn:active:not(:disabled),
+.login-button:active:not(:disabled) {
+  transform: scale(0.98);
+  transition: transform 0.05s;
+}
+
+/* Focus-visible for keyboard navigation */
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--brand-500);
+  outline-offset: 2px;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
