@@ -1,0 +1,28 @@
+appId: com.hoomestead.chat.dev
+productName: OpenClaw Client Dev
+directories:
+  output: release-dev
+publish:
+  provider: github
+  owner: hitmanbros
+  repo: hoomestead-chat
+  channel: dev
+files:
+  - dist/**/*
+  - dist-electron/**/*
+extraResources:
+  - from: src-rust/target/release/hoomestead-chat-server
+    to: hoomestead-chat-server
+    filter:
+      - "**/*"
+linux:
+  target:
+    - AppImage
+    - deb
+  category: Network;Chat
+win:
+  target:
+    - nsis
+  extraResources:
+    - from: src-rust/target/release/hoomestead-chat-server.exe
+      to: hoomestead-chat-server.exe
