@@ -5,6 +5,7 @@ import LoginScreen from "./components/user/LoginScreen";
 import TitleBar from "./components/layout/TitleBar";
 import ErrorBoundary from "./components/common/ErrorBoundary";
 import SettingsPage from "./components/settings/SettingsPage";
+import UpdateBanner from "./components/common/UpdateBanner";
 import { waitForBackendUrl } from "./api/transport";
 
 function App() {
@@ -42,6 +43,7 @@ function App() {
   return (
     <ErrorBoundary>
       <TitleBar />
+      <UpdateBanner />
       {isLoggedIn ? <AppLayout /> : <LoginScreen />}
       <SettingsPage />
     </ErrorBoundary>

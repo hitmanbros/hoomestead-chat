@@ -39,6 +39,12 @@ export interface CallMemberEvent {
   action: string; // "join" or "leave"
 }
 
+export interface ClientUpdateEvent {
+  sender: string;
+  message: string;
+  room_id: string;
+}
+
 type UnlistenFn = () => void;
 
 let eventSource: EventSource | null = null;
@@ -62,6 +68,7 @@ export function connectEvents(): UnlistenFn {
     "call-member",
     "sync-ready",
     "sync-error",
+    "client-update",
   ];
 
   for (const type of eventTypes) {
@@ -123,4 +130,8 @@ export function onCallMember(callback: (event: CallMemberEvent) => void): Unlist
 
 export function onSyncReady(callback: () => void): UnlistenFn {
   return addListener("sync-ready", callback);
+}
+
+export function onClientUpdate(callback: (event: ClientUpdateEvent) => void): UnlistenFn {
+  return addListener("client-update", callback);
 }

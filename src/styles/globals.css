@@ -419,3 +419,55 @@ input:focus-visible {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Update Banner */
+.update-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 8px 16px;
+  background: var(--brand-500);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  z-index: 9999;
+}
+
+.update-banner-text {
+  flex: 1;
+  text-align: center;
+}
+
+.update-banner-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.update-banner-btn {
+  padding: 4px 16px;
+  border: none;
+  border-radius: 3px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.update-banner-btn.update {
+  background: #fff;
+  color: var(--brand-500);
+}
+
+.update-banner-btn.update:hover {
+  background: #e0e0e0;
+}
+
+.update-banner-btn.dismiss {
+  background: transparent;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.update-banner-btn.dismiss:hover {
+  border-color: #fff;
+}

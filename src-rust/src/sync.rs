@@ -106,6 +106,16 @@ pub async fn start_sync(
                         }
                     });
 
+                // Detect client update trigger from builder bot
+                if body.starts_with("!client-update") {
+                    let commit_msg = body.strip_prefix("!client-update").unwrap_or("").trim();
+                    emit(&tx, "client-update", serde_json::json!({
+                        "sender": &sender,
+                        "message": commit_msg,
+                        "room_id": &room_id,
+                    }));
+                }
+
                 let msg = MessageInfo {
                     event_id: event.event_id.to_string(),
                     sender,
