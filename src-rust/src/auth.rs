@@ -6,6 +6,8 @@ use axum::extract::State;
 use axum::Json;
 use matrix_sdk::authentication::matrix::MatrixSession;
 use matrix_sdk::Client;
+use matrix_sdk::config::RequestConfig;
+use std::time::Duration;
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 use std::sync::Arc;
@@ -45,6 +47,7 @@ fn delete_session_from_disk(data_dir: &PathBuf) {
 async fn build_client(homeserver_url: &str, data_dir: &PathBuf) -> Result<Client, String> {
     Client::builder()
         .homeserver_url(homeserver_url)
+        .request_config(RequestConfig::default().timeout(Duration::from_secs(30)))
         .sqlite_store(data_dir, None)
         .build()
         .await
