@@ -16,7 +16,9 @@ function App() {
   const [backendReady, setBackendReady] = useState(false);
 
   useEffect(() => {
-    waitForBackendUrl().then(() => setBackendReady(true));
+    waitForBackendUrl()
+      .then(() => setBackendReady(true))
+      .catch(() => setBackendReady(true));
   }, []);
 
   useEffect(() => {

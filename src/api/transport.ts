@@ -32,13 +32,17 @@ export async function waitForBackendUrl(): Promise<string> {
 /** Standard fetch wrapper with error handling. */
 export async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
   const url = `${getBackendUrl()}${path}`;
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 30000);
   const resp = await fetch(url, {
     ...options,
+    signal: controller.signal,
     headers: {
       "Content-Type": "application/json",
       ...options?.headers,
     },
   });
+  clearTimeout(timeoutId);
 
   if (!resp.ok) {
     const body = await resp.json().catch(() => ({ error: resp.statusText }));
