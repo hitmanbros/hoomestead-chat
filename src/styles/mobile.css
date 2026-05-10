@@ -1,0 +1,203 @@
+/* =========================================================
+   Mobile Layout — Capacitor / Android
+   ========================================================= */
+
+/* Safe area insets for notches, gesture bars */
+:root {
+  --sat: env(safe-area-inset-top);
+  --sar: env(safe-area-inset-right);
+  --sab: env(safe-area-inset-bottom);
+  --sal: env(safe-area-inset-left);
+}
+
+/* Hide Electron titlebar on mobile */
+@media (max-width: 768px) {
+  .titlebar {
+    display: none !important;
+  }
+
+  .app-layout {
+    padding-top: 0;
+    padding-bottom: calc(64px + var(--sab));
+    flex-direction: column;
+  }
+
+  /* Server sidebar — full screen overlay on mobile */
+  .server-sidebar {
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    padding: 12px;
+    padding-top: calc(12px + var(--sat));
+    height: auto;
+    min-height: 100%;
+  }
+
+  .server-icon {
+    width: 56px;
+    height: 56px;
+  }
+
+  /* Channel sidebar — full screen */
+  .channel-sidebar {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Main content — full width */
+  .main-content {
+    width: 100%;
+  }
+
+  /* Member sidebar — slide-in overlay */
+  .member-sidebar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 64px;
+    width: 280px;
+    z-index: 100;
+    transform: translateX(0);
+    box-shadow: -4px 0 16px rgba(0,0,0,0.5);
+  }
+
+  /* Bottom navigation */
+  .mobile-bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: calc(64px + var(--sab));
+    padding-bottom: var(--sab);
+    background: var(--background-tertiary);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    z-index: 200;
+    border-top: 1px solid var(--background-modifier-accent);
+  }
+
+  .mobile-nav-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 10px;
+    padding: 6px 12px;
+    min-width: 56px;
+    min-height: 48px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: color 0.15s, background 0.15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .mobile-nav-btn:active {
+    background: var(--background-modifier-active);
+  }
+
+  .mobile-nav-btn.active {
+    color: var(--text-normal);
+  }
+
+  .mobile-nav-btn svg {
+    opacity: 0.7;
+    transition: opacity 0.15s;
+  }
+
+  .mobile-nav-btn.active svg {
+    opacity: 1;
+  }
+
+  /* Touch targets — larger for fingers */
+  .message-item {
+    padding: 12px 16px;
+  }
+
+  .channel-item,
+  .dm-item {
+    padding: 14px 16px;
+    min-height: 48px;
+  }
+
+  .server-icon {
+    min-width: 56px;
+    min-height: 56px;
+  }
+
+  /* Message input bar — thicker */
+  .message-input-container {
+    padding: 12px 16px;
+    padding-bottom: calc(12px + var(--sab));
+  }
+
+  /* Scrollable areas — momentum scrolling */
+  .messages-list,
+  .channel-list,
+  .member-list,
+  .server-sidebar {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+  }
+
+  /* Modals — full screen on mobile */
+  .modal-overlay {
+    align-items: flex-end;
+  }
+
+  .modal-content {
+    width: 100%;
+    max-width: 100%;
+    border-radius: 16px 16px 0 0;
+    max-height: 90vh;
+  }
+
+  /* Context menu — bigger touch targets */
+  .context-menu-item {
+    padding: 14px 20px;
+    font-size: 15px;
+  }
+
+  /* Mobile settings placeholder */
+  .mobile-settings-view {
+    padding: 24px 16px;
+    padding-top: calc(24px + var(--sat));
+    color: var(--text-normal);
+    flex: 1;
+    overflow-y: auto;
+  }
+
+  /* Toast positioning — above bottom nav */
+  .toasts-container {
+    bottom: calc(80px + var(--sab));
+  }
+}
+
+/* Extra small screens */
+@media (max-width: 380px) {
+  .mobile-nav-btn span {
+    font-size: 9px;
+  }
+
+  .mobile-nav-btn svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+/* Landscape mobile — keep bottom nav, adjust padding */
+@media (max-width: 768px) and (orientation: landscape) {
+  .app-layout {
+    padding-bottom: calc(56px + var(--sab));
+  }
+
+  .mobile-bottom-nav {
+    height: calc(56px + var(--sab));
+  }
+}

@@ -759,3 +759,42 @@
   background: var(--background-modifier-accent);
   animation: skeleton-pulse 1.2s ease-in-out infinite;
 }
+
+.login-hint {
+  display: block;
+  margin-top: 6px;
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+/* Mobile login adjustments */
+@media (max-width: 768px) {
+  .login-container {
+    padding-top: var(--sat);
+    align-items: flex-start;
+    padding: 16px;
+  }
+
+  .login-card {
+    padding: 24px 20px;
+    width: 100%;
+    max-width: 100%;
+    margin-top: calc(24px + var(--sat));
+  }
+
+  .login-card h1 {
+    font-size: 22px;
+  }
+
+  .login-field input {
+    padding: 14px;
+    font-size: 16px; /* Prevents iOS zoom on focus */
+  }
+
+  .login-button {
+    padding: 16px;
+    font-size: 16px;
+    min-height: 52px;
+  }
+}

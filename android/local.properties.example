@@ -1,0 +1,4 @@
+# Copy this file to local.properties and set your Android SDK path:
+# sdk.dir=/home/YOURNAME/Android/Sdk
+# Or on macOS:
+# sdk.dir=/Users/YOURNAME/Library/Android/sdk

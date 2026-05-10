@@ -4,12 +4,14 @@ import ChannelSidebar from "./ChannelSidebar";
 import HomeSidebar from "./HomeSidebar";
 import MainContent from "./MainContent";
 import MemberSidebar from "./MemberSidebar";
+import MobileBottomNav from "./MobileBottomNav";
 import Toasts from "../common/Toasts";
 import { useSpaceStore } from "../../store/spaceStore";
 import { useRoomStore } from "../../store/roomStore";
 import { useMessageStore } from "../../store/messageStore";
 import { useMemberStore } from "../../store/memberStore";
 import { useUIStore } from "../../store/uiStore";
+import { useIsMobile } from "../../hooks/useMobile";
 import {
   connectEvents,
   onNewMessage,
@@ -24,6 +26,7 @@ export default function AppLayout() {
   const selectedSpaceId = useSpaceStore((s) => s.selectedSpaceId);
   const selectedRoomId = useRoomStore((s) => s.selectedRoomId);
   const showMemberSidebar = useUIStore((s) => s.showMemberSidebar);
+  const mobileView = useUIStore((s) => s.mobileView);
   const addMessage = useMessageStore((s) => s.addMessage);
   const addReaction = useMessageStore((s) => s.addReaction);
   const setTypingUsers = useMemberStore((s) => s.setTypingUsers);
@@ -31,6 +34,7 @@ export default function AppLayout() {
   const fetchMembers = useMemberStore((s) => s.fetchMembers);
   const fetchSpaces = useSpaceStore((s) => s.fetchSpaces);
   const selectSpace = useSpaceStore((s) => s.selectSpace);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     const unlisteners: (() => void)[] = [];
@@ -89,6 +93,33 @@ export default function AppLayout() {
 
     return () => unlisteners.forEach((fn) => fn());
   }, []);
+
+  if (isMobile) {
+    return (
+      <>
+        <div className="app-layout mobile">
+          {mobileView === "servers" && <ServerSidebar />}
+          {mobileView === "channels" && (
+            selectedSpaceId ? <ChannelSidebar /> : <HomeSidebar />
+          )}
+          {mobileView === "chat" && (
+            <>
+              <MainContent />
+              {selectedRoomId && showMemberSidebar && <MemberSidebar />}
+            </>
+          )}
+          {mobileView === "settings" && (
+            <div className="mobile-settings-view">
+              <h2>Settings</h2>
+              <p>Settings page for mobile — wire up your SettingsPage component here.</p>
+            </div>
+          )}
+        </div>
+        <MobileBottomNav />
+        <Toasts />
+      </>
+    );
+  }
 
   return (
     <>

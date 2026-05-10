@@ -16,9 +16,17 @@
     "preview": "vite preview",
     "package": "npm run build && npm run build:electron && electron-builder",
     "package:dev": "npm run build && npm run build:electron && electron-builder --config electron-builder.dev.yml",
-    "typecheck": "tsc --noEmit -p tsconfig.json"
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "cap:sync": "npm run build && npx cap sync",
+    "cap:android": "npm run cap:sync && npx cap open android",
+    "cap:build:android": "npm run cap:sync && cd android && ./gradlew assembleRelease"
   },
   "dependencies": {
+    "@capacitor/android": "^8.3.3",
+    "@capacitor/cli": "^8.3.3",
+    "@capacitor/core": "^8.3.3",
+    "@capacitor/splash-screen": "^8.0.1",
+    "@capacitor/status-bar": "^8.0.2",
     "@types/dompurify": "^3.0.5",
     "date-fns": "^4.1.0",
     "dompurify": "^3.3.3",
