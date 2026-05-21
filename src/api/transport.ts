@@ -1,6 +1,8 @@
+const STORAGE_KEY = "openclaw_backend_url";
 let _cachedUrl: string | null = null;
 
-/** Backend URL detection — works in Electron (preload-injected) and browser (env var or same origin). */
+/** Backend URL detection — works in Electron (preload-injected), browser (env var or same origin),
+ *  and mobile (localStorage override). */
 export function getBackendUrl(): string {
   if (_cachedUrl !== null) return _cachedUrl;
   // Electron: preload script injects this
@@ -14,8 +16,42 @@ export function getBackendUrl(): string {
     _cachedUrl = import.meta.env.VITE_BACKEND_URL as string;
     return _cachedUrl;
   }
+  // Mobile / standalone: user-configured backend URL
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      _cachedUrl = stored;
+      return stored;
+    }
+  } catch {
+    // localStorage may be unavailable in some contexts
+  }
   // Default: same origin (when served from the Rust backend directly)
   return "";
+}
+
+/** Explicitly set the backend URL (used on mobile where there is no local sidecar). */
+export function setBackendUrl(url: string): void {
+  _cachedUrl = url;
+  try {
+    if (url) {
+      localStorage.setItem(STORAGE_KEY, url);
+    } else {
+      localStorage.removeItem(STORAGE_KEY);
+    }
+  } catch {
+    // ignore
+  }
+}
+
+/** Clear any stored backend URL. */
+export function clearBackendUrl(): void {
+  _cachedUrl = null;
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+  } catch {
+    // ignore
+  }
 }
 
 /** Wait for backend URL to be available (needed in Electron where preload is async). */

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">OpenClaw</string>
+    <string name="title_activity_main">OpenClaw</string>
+    <string name="package_name">com.hoomestead.chat</string>
+    <string name="custom_url_scheme">com.hoomestead.chat</string>
+</resources>
