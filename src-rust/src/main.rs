@@ -93,14 +93,17 @@ async fn main() {
         .and_then(|p| p.parse().ok())
         .unwrap_or(0);
 
-    let listener = TcpListener::bind(format!("127.0.0.1:{}", port))
+    let bind_addr = std::env::var("HOOMESTEAD_BIND")
+        .unwrap_or_else(|_| "127.0.0.1".to_string());
+
+    let listener = TcpListener::bind(format!("{}:{}", bind_addr, port))
         .expect("Failed to bind");
-    let actual_port = listener.local_addr().unwrap().port();
+    let actual_addr = listener.local_addr().unwrap();
 
     // Print port as JSON on first line for Electron to read
-    println!("{}", serde_json::json!({ "port": actual_port }));
+    println!("{}", serde_json::json!({ "port": actual_addr.port() }));
 
-    tracing::info!("Server listening on 127.0.0.1:{}", actual_port);
+    tracing::info!("Server listening on {}:{}", bind_addr, actual_addr.port());
 
     let listener = tokio::net::TcpListener::from_std(listener).unwrap();
     axum::serve(listener, app).await.unwrap();

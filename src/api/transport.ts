@@ -1,4 +1,5 @@
 const STORAGE_KEY = "openclaw_backend_url";
+const DEFAULT_BACKEND_URL = "http://100.64.108.87:8787";
 let _cachedUrl: string | null = null;
 
 /** Backend URL detection — works in Electron (preload-injected), browser (env var or same origin),
@@ -27,7 +28,8 @@ export function getBackendUrl(): string {
     // localStorage may be unavailable in some contexts
   }
   // Default: same origin (when served from the Rust backend directly)
-  return "";
+  _cachedUrl = DEFAULT_BACKEND_URL;
+  return DEFAULT_BACKEND_URL;
 }
 
 /** Explicitly set the backend URL (used on mobile where there is no local sidecar). */

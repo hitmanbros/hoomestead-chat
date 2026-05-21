@@ -1,82 +1,11 @@
 import { app, BrowserWindow, ipcMain } from "electron";
 import { autoUpdater } from "electron-updater";
-import { spawn, ChildProcess } from "child_process";
 import path from "path";
 
 let mainWindow: BrowserWindow | null = null;
-let sidecar: ChildProcess | null = null;
-let backendPort: number | null = null;
 
-function getSidecarPath(): string {
-  if (app.isPackaged) {
-    const ext = process.platform === "win32" ? ".exe" : "";
-    return path.join(process.resourcesPath, `hoomestead-chat-server${ext}`);
-  }
-  const ext = process.platform === "win32" ? ".exe" : "";
-  return path.join(__dirname, "..", "src-rust", "target", "release", `hoomestead-chat-server${ext}`);
-}
-
-function startSidecar(): Promise<number> {
-  return new Promise((resolve, reject) => {
-    const binPath = getSidecarPath();
-    console.log(`Starting sidecar: ${binPath}`);
-
-    sidecar = spawn(binPath, [], {
-      stdio: ["ignore", "pipe", "pipe"],
-      env: { ...process.env },
-    });
-
-    let resolved = false;
-
-    sidecar.stdout!.on("data", (data: Buffer) => {
-      const lines = data.toString().split("\n");
-      for (const line of lines) {
-        const trimmed = line.trim();
-        if (!trimmed) continue;
-        if (!resolved) {
-          try {
-            const parsed = JSON.parse(trimmed);
-            if (parsed.port) {
-              resolved = true;
-              resolve(parsed.port);
-              continue;
-            }
-          } catch {
-            // Not JSON, ignore
-          }
-        }
-        console.log(`[backend] ${trimmed}`);
-      }
-    });
-
-    sidecar.stderr!.on("data", (data: Buffer) => {
-      console.error(`[backend] ${data.toString().trim()}`);
-    });
-
-    sidecar.on("error", (err) => {
-      if (!resolved) {
-        resolved = true;
-        reject(new Error(`Failed to start backend: ${err.message}`));
-      }
-    });
-
-    sidecar.on("exit", (code) => {
-      console.log(`Backend exited with code ${code}`);
-      if (!resolved) {
-        resolved = true;
-        reject(new Error(`Backend exited prematurely with code ${code}`));
-      }
-      sidecar = null;
-    });
-
-    setTimeout(() => {
-      if (!resolved) {
-        resolved = true;
-        reject(new Error("Backend did not report port within 10 seconds"));
-      }
-    }, 10000);
-  });
-}
+// VPS backend URL (Tailscale IP — reachable from both desktop and mobile)
+const BACKEND_URL = "http://100.64.108.87:8787";
 
 function setupAutoUpdater() {
   autoUpdater.autoDownload = false;
@@ -146,16 +75,7 @@ function createWindow() {
 }
 
 app.whenReady().then(async () => {
-  try {
-    backendPort = await startSidecar();
-    console.log(`Backend running on port ${backendPort}`);
-  } catch (err) {
-    console.error("Failed to start backend:", err);
-    app.quit();
-    return;
-  }
-
-  ipcMain.handle("get-backend-url", () => `http://127.0.0.1:${backendPort}`);
+  ipcMain.handle("get-backend-url", () => BACKEND_URL);
 
   ipcMain.handle("check-for-updates", () => {
     if (app.isPackaged) {
@@ -168,10 +88,6 @@ app.whenReady().then(async () => {
   });
 
   ipcMain.handle("install-update", () => {
-    if (sidecar) {
-      sidecar.kill();
-      sidecar = null;
-    }
     autoUpdater.quitAndInstall();
   });
 
@@ -190,16 +106,9 @@ app.whenReady().then(async () => {
 });
 
 app.on("window-all-closed", () => {
-  if (sidecar) {
-    sidecar.kill();
-    sidecar = null;
-  }
   app.quit();
 });
 
 app.on("before-quit", () => {
-  if (sidecar) {
-    sidecar.kill();
-    sidecar = null;
-  }
+  // no-op
 });
