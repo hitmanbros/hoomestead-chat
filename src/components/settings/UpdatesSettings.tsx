@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 type Status =
   | { kind: "idle" }
   | { kind: "checking" }
-  | { kind: "available"; version: string }
+  | { kind: "available"; version: string; manual?: boolean; url?: string }
   | { kind: "downloading"; percent: number }
   | { kind: "ready" }
   | { kind: "up-to-date" }
@@ -13,10 +13,11 @@ declare global {
   interface Window {
     electronAPI?: {
       getAppVersion?: () => Promise<string>;
+      openExternal?: (url: string) => Promise<void>;
       checkForUpdates?: () => Promise<void>;
       downloadUpdate?: () => Promise<void>;
       installUpdate?: () => Promise<void>;
-      onUpdateAvailable?: (cb: (info: { version: string }) => void) => void;
+      onUpdateAvailable?: (cb: (info: { version: string; manual?: boolean; url?: string }) => void) => void;
       onUpdateProgress?: (cb: (info: { percent: number }) => void) => void;
       onUpdateDownloaded?: (cb: () => void) => void;
       onUpdateError?: (cb: (msg: string) => void) => void;
@@ -38,7 +39,7 @@ export default function UpdatesSettings() {
     if (!api) return;
 
     api.onUpdateAvailable?.((info) => {
-      setStatus({ kind: "available", version: info.version });
+      setStatus({ kind: "available", version: info.version, manual: info.manual, url: info.url });
     });
     api.onUpdateProgress?.((info) => {
       setStatus({ kind: "downloading", percent: Math.round(info.percent) });
@@ -85,17 +86,27 @@ export default function UpdatesSettings() {
         return <div className="settings-description">Checking for updates...</div>;
       case "up-to-date":
         return <div className="settings-description">You're on the latest version.</div>;
-      case "available":
+      case "available": {
+        const manualUrl = status.manual && status.url ? status.url : null;
         return (
           <div className="settings-description">
             Update available: v{status.version}
+            {manualUrl && " — download and install manually"}
             <div style={{ marginTop: 8 }}>
-              <button className="settings-btn" onClick={handleDownload}>
-                Download Update
+              <button
+                className="settings-btn"
+                onClick={() =>
+                  manualUrl
+                    ? window.electronAPI?.openExternal?.(manualUrl)
+                    : handleDownload()
+                }
+              >
+                {manualUrl ? "Download" : "Download Update"}
               </button>
             </div>
           </div>
         );
+      }
       case "downloading":
         return <div className="settings-description">Downloading... {status.percent}%</div>;
       case "ready":

@@ -5,10 +5,11 @@ declare global {
   interface Window {
     electronAPI?: {
       getAppVersion?: () => Promise<string>;
+      openExternal?: (url: string) => Promise<void>;
       checkForUpdates?: () => Promise<void>;
       downloadUpdate?: () => Promise<void>;
       installUpdate?: () => Promise<void>;
-      onUpdateAvailable?: (cb: (info: { version: string }) => void) => void;
+      onUpdateAvailable?: (cb: (info: { version: string; manual?: boolean; url?: string }) => void) => void;
       onUpdateProgress?: (cb: (info: { percent: number }) => void) => void;
       onUpdateDownloaded?: (cb: () => void) => void;
       onUpdateError?: (cb: (msg: string) => void) => void;
@@ -23,6 +24,7 @@ export default function UpdateBanner() {
   const [state, setState] = useState<UpdateState>("idle");
   const [message, setMessage] = useState("");
   const [percent, setPercent] = useState(0);
+  const [manualUrl, setManualUrl] = useState<string | null>(null);
 
   useEffect(() => {
     const api = window.electronAPI;
@@ -31,6 +33,7 @@ export default function UpdateBanner() {
     api.onUpdateAvailable?.((info) => {
       setState("available");
       setMessage(`v${info.version} available`);
+      setManualUrl(info.manual && info.url ? info.url : null);
     });
 
     api.onUpdateProgress?.((info) => {
@@ -58,6 +61,12 @@ export default function UpdateBanner() {
   if (state === "idle") return null;
 
   const handleDownload = () => {
+    // macOS (unsigned): open the release page for manual download instead of
+    // a Squirrel auto-install, which requires a signed + notarized app.
+    if (manualUrl) {
+      window.electronAPI?.openExternal?.(manualUrl);
+      return;
+    }
     setState("downloading");
     window.electronAPI?.downloadUpdate?.();
   };
@@ -82,7 +91,7 @@ export default function UpdateBanner() {
       <div className="update-banner-actions">
         {state === "available" && (
           <button className="update-banner-btn update" onClick={handleDownload}>
-            Download Update
+            {manualUrl ? "Download" : "Download Update"}
           </button>
         )}
         {state === "ready" && (
