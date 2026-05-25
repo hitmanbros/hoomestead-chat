@@ -427,6 +427,55 @@ pub async fn delete_room(
     Ok(Json(()))
 }
 
+#[derive(serde::Serialize)]
+pub struct InviteInfo {
+    pub room_id: String,
+    pub name: Option<String>,
+    pub topic: Option<String>,
+    pub is_direct: bool,
+    pub is_space: bool,
+    pub avatar_url: Option<String>,
+    pub inviter: Option<String>,
+}
+
+pub async fn list_invites(
+    State(state): State<Arc<AppState>>,
+) -> AppResult<Json<Vec<InviteInfo>>> {
+    let client_lock = state.client.read().await;
+    let client = client_lock.as_ref().ok_or("Not logged in")?;
+
+    let mut invites = Vec::new();
+    for room in client.invited_rooms() {
+        let inviter: Option<String> = None;
+
+        invites.push(InviteInfo {
+            room_id: room.room_id().to_string(),
+            name: room.name(),
+            topic: room.topic(),
+            is_direct: room.is_direct().await.unwrap_or(false),
+            is_space: room.room_type() == Some(RoomType::Space),
+            avatar_url: room.avatar_url().map(|u| u.to_string()),
+            inviter,
+        });
+    }
+    Ok(Json(invites))
+}
+
+pub async fn reject_invite(
+    State(state): State<Arc<AppState>>,
+    Path(room_id): Path<String>,
+) -> AppResult<Json<()>> {
+    let client_lock = state.client.read().await;
+    let client = client_lock.as_ref().ok_or("Not logged in")?;
+
+    let parsed_id = RoomId::parse(&room_id)
+        .map_err(|e| format!("Invalid room ID: {}", e))?;
+
+    let room = client.get_room(&parsed_id).ok_or("Invite not found")?;
+    room.leave().await.map_err(|e| format!("Failed to reject invite: {}", e))?;
+    Ok(Json(()))
+}
+
 /// List all joined rooms (for "add existing channel to space" UI)
 pub async fn get_all_joined_rooms(
     State(state): State<Arc<AppState>>,

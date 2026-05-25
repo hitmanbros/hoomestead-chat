@@ -4,6 +4,7 @@ import { onClientUpdate, type ClientUpdateEvent } from "../../api/events";
 declare global {
   interface Window {
     electronAPI?: {
+      getAppVersion?: () => Promise<string>;
       checkForUpdates?: () => Promise<void>;
       downloadUpdate?: () => Promise<void>;
       installUpdate?: () => Promise<void>;

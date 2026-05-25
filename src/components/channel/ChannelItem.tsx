@@ -23,6 +23,7 @@ export default function ChannelItem({ room, isSelected, onClick, onLeave }: Prop
   const [isLeaving, setIsLeaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const selectRoom = useRoomStore((s) => s.selectRoom);
+  const markRoomRead = useRoomStore((s) => s.markRoomRead);
   const selectedSpaceId = useSpaceStore((s) => s.selectedSpaceId);
   const addToast = useToastStore((s) => s.addToast);
 
@@ -66,6 +67,7 @@ export default function ChannelItem({ room, isSelected, onClick, onLeave }: Prop
       label: "Mark as Read",
       onClick: () => {
         api.sendReadReceipt(room.room_id, "").catch(() => {});
+        markRoomRead(room.room_id);
         addToast("success", "Marked as read");
       },
     },

@@ -1,7 +1,7 @@
 import { create } from "zustand";
 
 type HomeView = "friends" | "dms" | "discover";
-type SettingsPage = "profile" | "appearance" | "voice" | null;
+type SettingsPage = "profile" | "appearance" | "voice" | "updates" | null;
 
 interface UIState {
   showMemberSidebar: boolean;

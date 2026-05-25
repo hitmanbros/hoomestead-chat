@@ -1,6 +1,6 @@
 {
   "name": "openclaw-client",
-  "version": "1.0.2",
+  "version": "1.0.8",
   "description": "AI Agent Dashboard with Matrix Backend",
   "author": {
     "name": "Bryan Alvarez",
@@ -58,15 +58,6 @@
       "dist/**/*",
       "dist-electron/**/*"
     ],
-    "extraResources": [
-      {
-        "from": "src-rust/target/release/hoomestead-chat-server",
-        "to": "hoomestead-chat-server",
-        "filter": [
-          "**/*"
-        ]
-      }
-    ],
     "linux": {
       "target": [
         "AppImage",
@@ -77,12 +68,6 @@
     "win": {
       "target": [
         "nsis"
-      ],
-      "extraResources": [
-        {
-          "from": "src-rust/target/release/hoomestead-chat-server.exe",
-          "to": "hoomestead-chat-server.exe"
-        }
       ]
     }
   }

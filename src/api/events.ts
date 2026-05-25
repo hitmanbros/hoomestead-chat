@@ -32,6 +32,10 @@ export interface MemberChangeEvent {
   avatar_url: string | null;
 }
 
+export interface PowerLevelChangeEvent {
+  room_id: string;
+}
+
 export interface CallMemberEvent {
   room_id: string;
   user_id: string;
@@ -65,6 +69,7 @@ export function connectEvents(): UnlistenFn {
     "presence-update",
     "reaction",
     "member-change",
+    "power-level-change",
     "call-member",
     "sync-ready",
     "sync-error",
@@ -122,6 +127,10 @@ export function onReaction(callback: (event: ReactionEvent) => void): UnlistenFn
 
 export function onMemberChange(callback: (event: MemberChangeEvent) => void): UnlistenFn {
   return addListener("member-change", callback);
+}
+
+export function onPowerLevelChange(callback: (event: PowerLevelChangeEvent) => void): UnlistenFn {
+  return addListener("power-level-change", callback);
 }
 
 export function onCallMember(callback: (event: CallMemberEvent) => void): UnlistenFn {

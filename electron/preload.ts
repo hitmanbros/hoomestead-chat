@@ -10,6 +10,7 @@ const backendUrlPromise = ipcRenderer.invoke("get-backend-url").then((url: strin
 contextBridge.exposeInMainWorld("electronAPI", {
   getBackendUrl: () => cachedBackendUrl,
   getBackendUrlAsync: () => backendUrlPromise,
+  getAppVersion: () => ipcRenderer.invoke("get-app-version"),
   minimize: () => ipcRenderer.invoke("window-minimize"),
   maximize: () => ipcRenderer.invoke("window-maximize"),
   close: () => ipcRenderer.invoke("window-close"),

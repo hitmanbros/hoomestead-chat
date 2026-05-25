@@ -1,13 +1,15 @@
-use crate::models::{CallMemberChangeEvent, MemberChangeEvent, MessageInfo, NewMessageEvent, ReactionEvent, TypingEvent};
+use crate::models::{CallMemberChangeEvent, MemberChangeEvent, MessageInfo, NewMessageEvent, PowerLevelChangeEvent, ReactionEvent, TypingEvent};
 use crate::sse::SseEvent;
 use matrix_sdk::{
     config::SyncSettings,
     room::Room,
     ruma::events::{
         call::member::CallMemberEventContent,
+        presence::PresenceEvent,
         reaction::OriginalSyncReactionEvent,
         room::member::OriginalSyncRoomMemberEvent,
         room::message::{MessageType, OriginalSyncRoomMessageEvent},
+        room::power_levels::RoomPowerLevelsEventContent,
         typing::SyncTypingEvent,
         room::MediaSource,
         SyncStateEvent,
@@ -178,6 +180,31 @@ pub async fn start_sync(
                     membership,
                     display_name: event.content.displayname.clone(),
                     avatar_url: event.content.avatar_url.map(|u| u.to_string()),
+                });
+            }
+        },
+    );
+
+    let tx_pres = event_tx.clone();
+    client.add_event_handler(
+        move |event: PresenceEvent| {
+            let tx = tx_pres.clone();
+            async move {
+                emit(&tx, "presence-update", serde_json::json!({
+                    "user_id": event.sender.to_string(),
+                    "presence": event.content.presence.to_string(),
+                }));
+            }
+        },
+    );
+
+    let tx_pl = event_tx.clone();
+    client.add_event_handler(
+        move |_event: SyncStateEvent<RoomPowerLevelsEventContent>, room: Room| {
+            let tx = tx_pl.clone();
+            async move {
+                emit(&tx, "power-level-change", PowerLevelChangeEvent {
+                    room_id: room.room_id().to_string(),
                 });
             }
         },

@@ -7,6 +7,7 @@ import MemberSidebar from "./MemberSidebar";
 import Toasts from "../common/Toasts";
 import { useSpaceStore } from "../../store/spaceStore";
 import { useRoomStore } from "../../store/roomStore";
+import { useAuthStore } from "../../store/authStore";
 import { useMessageStore } from "../../store/messageStore";
 import { useMemberStore } from "../../store/memberStore";
 import { useUIStore } from "../../store/uiStore";
@@ -17,6 +18,7 @@ import {
   onPresence,
   onReaction,
   onMemberChange,
+  onPowerLevelChange,
   onSyncReady,
 } from "../../api/events";
 
@@ -26,6 +28,7 @@ export default function AppLayout() {
   const showMemberSidebar = useUIStore((s) => s.showMemberSidebar);
   const addMessage = useMessageStore((s) => s.addMessage);
   const addReaction = useMessageStore((s) => s.addReaction);
+  const incrementRoomUnread = useRoomStore((s) => s.incrementRoomUnread);
   const setTypingUsers = useMemberStore((s) => s.setTypingUsers);
   const updatePresence = useMemberStore((s) => s.updatePresence);
   const fetchMembers = useMemberStore((s) => s.fetchMembers);
@@ -51,6 +54,10 @@ export default function AppLayout() {
     unlisteners.push(
       onNewMessage((event) => {
         addMessage(event.room_id, event.message);
+        const myId = useAuthStore.getState().user?.user_id;
+        if (event.message.sender !== myId) {
+          incrementRoomUnread(event.room_id);
+        }
       }),
     );
 
@@ -80,6 +87,15 @@ export default function AppLayout() {
 
     unlisteners.push(
       onMemberChange((event) => {
+        const currentRoom = useRoomStore.getState().selectedRoomId;
+        if (currentRoom && event.room_id === currentRoom) {
+          fetchMembers(currentRoom);
+        }
+      }),
+    );
+
+    unlisteners.push(
+      onPowerLevelChange((event) => {
         const currentRoom = useRoomStore.getState().selectedRoomId;
         if (currentRoom && event.room_id === currentRoom) {
           fetchMembers(currentRoom);

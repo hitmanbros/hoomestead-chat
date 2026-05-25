@@ -54,6 +54,7 @@ export default function MessageList({ onReply }: Props) {
   const paginationByRoom = useMessageStore((s) => s.paginationByRoom);
   const selectedRoomId = useRoomStore((s) => s.selectedRoomId);
   const rooms = useRoomStore((s) => s.rooms);
+  const markRoomRead = useRoomStore((s) => s.markRoomRead);
   const containerRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const lastReceiptRef = useRef<string | null>(null);
@@ -118,8 +119,9 @@ export default function MessageList({ onReply }: Props) {
     if (lastMsg.event_id !== lastReceiptRef.current) {
       lastReceiptRef.current = lastMsg.event_id;
       api.sendReadReceipt(selectedRoomId, lastMsg.event_id).catch(() => {});
+      markRoomRead(selectedRoomId);
     }
-  }, [messages.length, selectedRoomId]);
+  }, [messages.length, selectedRoomId, markRoomRead]);
 
   if (isLoading) {
     return (

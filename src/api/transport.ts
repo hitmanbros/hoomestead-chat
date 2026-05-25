@@ -1,5 +1,5 @@
 const STORAGE_KEY = "openclaw_backend_url";
-const DEFAULT_BACKEND_URL = "http://100.64.108.87:8787";
+const DEFAULT_BACKEND_URL = "http://100.64.108.87:18080";
 let _cachedUrl: string | null = null;
 
 /** Backend URL detection — works in Electron (preload-injected), browser (env var or same origin),

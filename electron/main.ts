@@ -5,7 +5,7 @@ import path from "path";
 let mainWindow: BrowserWindow | null = null;
 
 // VPS backend URL (Tailscale IP — reachable from both desktop and mobile)
-const BACKEND_URL = "http://100.64.108.87:8787";
+const BACKEND_URL = "http://100.64.108.87:18080";
 
 function setupAutoUpdater() {
   autoUpdater.autoDownload = false;
@@ -76,6 +76,8 @@ function createWindow() {
 
 app.whenReady().then(async () => {
   ipcMain.handle("get-backend-url", () => BACKEND_URL);
+
+  ipcMain.handle("get-app-version", () => app.getVersion());
 
   ipcMain.handle("check-for-updates", () => {
     if (app.isPackaged) {

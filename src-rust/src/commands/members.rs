@@ -50,35 +50,10 @@ pub async fn get_room_members(
 
     let presences = futures::future::join_all(presence_futures).await;
 
-    let room_creator: Option<String> = {
-        use matrix_sdk::ruma::events::room::create::RoomCreateEventContent;
-        match room.get_state_event_static::<RoomCreateEventContent>().await {
-            Ok(Some(raw)) => raw.deserialize().ok().map(|ev| ev.sender().to_string()),
-            _ => None,
-        }
-    };
-
-    let max_power_level = {
-        let mut max = 0i64;
-        for m in &members {
-            let pl = m.power_level();
-            if pl > max { max = pl; }
-        }
-        if max < 100 { 100 } else { max }
-    };
-
     let mut result = Vec::with_capacity(members.len());
 
     for (member, presence) in members.iter().zip(presences) {
-        let mut power_level = member.power_level();
-
-        if power_level == 0 {
-            if let Some(ref creator) = room_creator {
-                if member.user_id().to_string() == *creator {
-                    power_level = max_power_level;
-                }
-            }
-        }
+        let power_level = member.power_level();
 
         let uid_str = member.user_id().to_string();
         let is_server_admin = am_i_server_admin && uid_str == my_user_id;

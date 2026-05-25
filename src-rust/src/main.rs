@@ -60,6 +60,8 @@ async fn main() {
         .route("/api/spaces/{space_id}/add-room", post(commands::rooms::add_room_to_space))
         .route("/api/rooms/{room_id}/leave", post(commands::rooms::leave_room))
         .route("/api/rooms/{room_id}/delete", post(commands::rooms::delete_room))
+        .route("/api/invites", get(commands::rooms::list_invites))
+        .route("/api/invites/{room_id}/reject", post(commands::rooms::reject_invite))
         // Messages
         .route("/api/rooms/{room_id}/messages", get(commands::messages::get_messages).post(commands::messages::send_message))
         // Members

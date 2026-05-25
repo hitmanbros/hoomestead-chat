@@ -3,8 +3,9 @@ import { useUIStore } from "../../store/uiStore";
 import { useAuthStore } from "../../store/authStore";
 import ProfileSettings from "./ProfileSettings";
 import AppearanceSettings from "./AppearanceSettings";
+import UpdatesSettings from "./UpdatesSettings";
 
-type PageId = "profile" | "appearance";
+type PageId = "profile" | "appearance" | "updates";
 
 interface SidebarNavItem {
   id: PageId;
@@ -27,6 +28,7 @@ const SIDEBAR_ITEMS: SidebarItem[] = [
   { id: "profile", label: "My Account", icon: "M12 12C14.21 12 16 10.21 16 8C16 5.79 14.21 4 12 4C9.79 4 8 5.79 8 8C8 10.21 9.79 12 12 12ZM12 14C9.33 14 4 15.34 4 18V20H20V18C20 15.34 14.67 14 12 14Z" },
   { section: "APP SETTINGS" },
   { id: "appearance", label: "Appearance", icon: "M12 22C6.49 22 2 17.51 2 12S6.49 2 12 2C17.51 2 22 6.49 22 12S17.51 22 12 22ZM18.92 8H15.97C15.65 6.75 15.19 5.55 14.59 4.44C16.43 5.07 17.96 6.35 18.92 8ZM12 4.04C11.17 5.24 10.53 6.57 10.1 8H13.9C13.47 6.57 12.83 5.24 12 4.04ZM4.26 14C4.1 13.36 4 12.69 4 12S4.1 10.64 4.26 10H7.64C7.56 10.66 7.5 11.32 7.5 12S7.56 13.34 7.64 14H4.26ZM5.08 16H8.03C8.35 17.25 8.81 18.45 9.41 19.56C7.57 18.93 6.04 17.66 5.08 16ZM8.03 8H5.08C6.04 6.34 7.57 5.07 9.41 4.44C8.81 5.55 8.35 6.75 8.03 8ZM12 19.96C12.83 18.76 13.47 17.43 13.9 16H10.1C10.53 17.43 11.17 18.76 12 19.96ZM14.34 14H9.66C9.57 13.34 9.5 12.68 9.5 12S9.57 10.65 9.66 10H14.34C14.43 10.65 14.5 11.32 14.5 12S14.43 13.34 14.34 14ZM14.59 19.56C15.19 18.45 15.65 17.25 15.97 16H18.92C17.96 17.65 16.43 18.93 14.59 19.56ZM16.36 14C16.44 13.34 16.5 12.68 16.5 12S16.44 10.66 16.36 10H19.74C19.9 10.64 20 11.31 20 12S19.9 13.36 19.74 14H16.36Z" },
+  { id: "updates", label: "Updates", icon: "M12 4V1L8 5L12 9V6C15.31 6 18 8.69 18 12C18 13.01 17.75 13.97 17.3 14.8L18.76 16.26C19.54 15.03 20 13.57 20 12C20 7.58 16.42 4 12 4ZM12 18C8.69 18 6 15.31 6 12C6 10.99 6.25 10.03 6.7 9.2L5.24 7.74C4.46 8.97 4 10.43 4 12C4 16.42 7.58 20 12 20V23L16 19L12 15V18Z" },
 ];
 
 export default function SettingsPage() {
@@ -78,7 +80,7 @@ export default function SettingsPage() {
             </button>
 
             <div className="settings-sidebar-footer">
-              <span className="settings-sidebar-version">OpenClaw Client v1.0.0</span>
+              <span className="settings-sidebar-version">OpenClaw Client v1.0.8</span>
             </div>
           </div>
         </div>
@@ -87,6 +89,7 @@ export default function SettingsPage() {
           <div className="settings-content-scroll">
             {settingsPage === "profile" && <ProfileSettings />}
             {settingsPage === "appearance" && <AppearanceSettings />}
+            {settingsPage === "updates" && <UpdatesSettings />}
           </div>
 
           <button className="settings-close-btn" onClick={closeSettings} aria-label="Close settings">

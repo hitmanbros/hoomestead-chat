@@ -72,6 +72,16 @@ export interface ReactionGroup {
   senders: string[];
 }
 
+export interface InviteInfo {
+  room_id: string;
+  name: string | null;
+  topic: string | null;
+  is_direct: boolean;
+  is_space: boolean;
+  avatar_url: string | null;
+  inviter: string | null;
+}
+
 export interface PublicSpaceInfo {
   room_id: string;
   name: string | null;
@@ -162,6 +172,20 @@ export const api = {
     apiFetch<void>(`/api/rooms/${encodeURIComponent(roomId)}/delete`, {
       method: "POST",
       body: JSON.stringify({ space_id: spaceId }),
+    }),
+
+  listInvites: () =>
+    apiFetch<InviteInfo[]>("/api/invites"),
+
+  acceptInvite: (roomId: string) =>
+    apiFetch<void>("/api/rooms/join", {
+      method: "POST",
+      body: JSON.stringify({ room_id: roomId }),
+    }),
+
+  rejectInvite: (roomId: string) =>
+    apiFetch<void>(`/api/invites/${encodeURIComponent(roomId)}/reject`, {
+      method: "POST",
     }),
 
   getMessages: (roomId: string, limit?: number, from?: string) => {
